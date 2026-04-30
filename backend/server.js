@@ -406,9 +406,11 @@ app.post('/api/auth/register', async (req, res) => {
     });
     
     if (!newUser) {
+      // Log the error for debugging
+      console.error('Failed to create user for email:', email);
       return res.status(500).json({ 
         error: 'Registration failed',
-        message: 'No se pudo crear la cuenta. Intenta nuevamente.'
+        message: 'No se pudo crear la cuenta. Por favor verifica que la contraseña tenga al menos 8 caracteres.'
       });
     }
     
@@ -443,7 +445,7 @@ app.post('/api/auth/register', async (req, res) => {
     console.error('Registration error:', error);
     res.status(500).json({ 
       error: 'Internal server error',
-      message: 'Ocurrió un error al crear la cuenta'
+      message: error.message || 'Ocurrió un error al crear la cuenta'
     });
   }
 });
