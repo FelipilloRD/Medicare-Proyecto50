@@ -20,11 +20,6 @@
       "dest": "backend/server.js"
     }
   ],
-  "functions": {
-    "backend/server.js": {
-      "includeFiles": "frontend/**"
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }
