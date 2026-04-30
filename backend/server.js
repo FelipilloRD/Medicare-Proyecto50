@@ -1408,6 +1408,54 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * GET /api/debug - Debug endpoint (solo para desarrollo)
+ */
+app.get('/api/debug', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    // Solo permitir en desarrollo o con parámetro especial
+    if (process.env.NODE_ENV === 'production' && !req.query.force) {
+      return res.status(403).json({ error: 'Debug endpoint disabled in production' });
+    }
+    
+    const database = require('./database-postgres');
+    
+    // Test 1: Verificar conexión a base de datos
+    const dbTest = await database.testConnection();
+    
+    // Test 2: Contar usuarios
+    const userCount = await database.getUserCount();
+    
+    // Test 3: Listar usuarios (sin contraseñas)
+    const users = await database.getAllUsersDebug();
+    
+    // Test 4: Verificar variables de entorno
+    const envCheck = {
+      DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
+      DB_SSL: process.env.DB_SSL,
+      NODE_ENV: process.env.NODE_ENV
+    };
+    
+    res.json({
+      success: true,
+      debug: {
+        database: dbTest,
+        userCount,
+        users,
+        environment: envCheck,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Debug endpoint error:', error);
+    res.status(500).json({ 
+      error: 'Debug failed',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+/**
  * GET /api/health - Health check endpoint for API
  */
 app.get('/api/health', (req, res) => {

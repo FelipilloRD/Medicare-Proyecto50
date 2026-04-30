@@ -495,6 +495,34 @@ async function testConnection() {
   }
 }
 
+/**
+ * Get user count (for debugging)
+ */
+async function getUserCount() {
+  try {
+    const result = await pool.query('SELECT COUNT(*) as count FROM users');
+    return parseInt(result.rows[0].count);
+  } catch (error) {
+    console.error('Error getting user count:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all users for debugging (without passwords)
+ */
+async function getAllUsersDebug() {
+  try {
+    const result = await pool.query(
+      'SELECT id, username, email, role, LEFT(password, 20) || \'...\' as password_preview, created_at FROM users ORDER BY created_at DESC'
+    );
+    return result.rows;
+  } catch (error) {
+    console.error('Error getting all users debug:', error);
+    throw error;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // EXPORTS
 // ═══════════════════════════════════════════════════════════════
@@ -530,8 +558,12 @@ module.exports = {
   getAppointmentsByService,
   getAppointmentsByDay,
   
+  // Debug
+  testConnection,
+  getUserCount,
+  getAllUsersDebug,
+  
   // Utilities
   closePool,
-  testConnection,
   pool // Exportar pool para queries personalizadas
 };
