@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Clínica MediCare - Login">
+  <title>✦ Clínica MediCare - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Login-specific styles */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-md);
+    }
+    
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      max-width: 450px;
+      width: 100%;
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(10px);
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .login-logo-icon {
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+      animation: pulse 3s ease-in-out infinite;
+    }
+    
+    .login-logo-icon svg {
+      width: 48px;
+      height: 48px;
+      color: var(--accent-blue);
+    }
+    
+    .login-logo-text {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .login-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    .login-form {
+      margin-top: var(--spacing-lg);
+    }
+    
+    .login-form .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .login-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .login-form input {
+      width: 100%;
+      background: var(--bg-tertiary);
+      border: 2px solid rgba(59, 130, 246, 0.2);
+      color: var(--text-primary);
+      padding: 0.875rem 1rem;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: all var(--transition-fast);
+    }
+    
+    .login-form input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: var(--bg-secondary);
+    }
+    
+    .login-form input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .login-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--error);
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--spacing-md);
+      font-size: 0.9rem;
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .login-error.show {
+      display: block;
+    }
+    
+    .login-btn {
+      width: 100%;
+      margin-top: var(--spacing-md);
+    }
+    
+    .login-footer {
+      text-align: center;
+      margin-top: var(--spacing-lg);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid rgba(59, 130, 246, 0.1);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .lang-selector-login {
+      position: absolute;
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid rgba(79, 143, 255, 0.3);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .lang-selector-login:hover {
+      border-color: var(--accent-blue);
+    }
+    
+    @media (max-width: 768px) {
+      .login-card {
+        padding: var(--spacing-lg);
+      }
+      
+      .login-logo-text {
+        font-size: 1.5rem;
+      }
+      
+      .login-title {
+        font-size: 1.25rem;
+      }
+      
+      /* Language selector mobile fix */
+      .lang-selector-login {
+        position: fixed;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        padding: 0.75rem var(--spacing-sm);
+        font-size: 1rem;
+        min-width: 120px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 9999;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233b82f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 12px;
+        padding-right: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      
+      .lang-selector-login:focus {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+      }
+      
+      .lang-selector-login:active {
+        transform: scale(0.98);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Language Selector -->
+  <select id="lang-selector" class="lang-selector-login">
+    <option value="es">🇪🇸 ES</option>
+    <option value="en">🇺🇸 EN</option>
+    <option value="fr">🇫🇷 FR</option>
+    <option value="pt">🇧🇷 PT</option>
+    <option value="de">🇩🇪 DE</option>
+  </select>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <div class="login-logo-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="18" y="8" width="12" height="32" rx="2" fill="currentColor"/>
+              <rect x="8" y="18" width="32" height="12" rx="2" fill="currentColor"/>
+              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+          <span class="login-logo-text">Clínica MediCare</span>
+        </div>
+        <h1 class="login-title" data-i18n="login_title">Iniciar Sesión</h1>
+        <p class="login-subtitle" data-i18n="login_subtitle">Accede a tu cuenta para continuar</p>
+      </div>
+      
+      <div id="login-error" class="login-error"></div>
+      
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="username" data-i18n="login_username">Usuario o Email</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            required 
+            autocomplete="username"
+            placeholder="admin"
+            data-i18n-placeholder="login_username_placeholder"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="password" data-i18n="login_password">Contraseña</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            autocomplete="current-password"
+            placeholder="••••••••"
+          >
+        </div>
+        
+        <button type="submit" class="btn btn-primary login-btn" id="login-btn">
+          <span data-i18n="login_button">Iniciar Sesión</span>
+        </button>
+      </form>
+      
+      <div class="login-footer">
+        <p data-i18n="login_footer">
+          Sistema de Citas Médicas Profesional<br>
+          © 2026 Clínica MediCare
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="i18n.js"></script>
+  <script>
+    // Initialize language selector
+    const langSelector = document.getElementById('lang-selector');
+    if (langSelector) {
+      langSelector.value = window.i18n.getCurrentLanguage();
+      
+      langSelector.addEventListener('change', (e) => {
+        const newLang = e.target.value;
+        console.log(`🌍 Cambiando idioma a: ${newLang}`);
+        window.i18n.setLanguage(newLang);
+        // Las traducciones se aplican automáticamente, no necesita reload
+      });
+    }
+    
+    // Handle login form submission
+    const loginForm = document.getElementById('login-form');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+    
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (!username || !password) {
+        showError(window.i18n.t('login_error_empty') || 'Por favor completa todos los campos');
+        return;
+      }
+      
+      try {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span data-i18n="login_loading">Iniciando sesión...</span>';
+        hideError();
+        
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include', // Important for cookies
+          body: JSON.stringify({ username, password })
+        });
+        
+        // Read response as text first to handle empty responses
+        const text = await response.text();
+        let data = {};
+        
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            console.error('Response text:', text);
+            throw new Error(`Respuesta inválida del servidor (${response.status})`);
+          }
+        } else {
+          throw new Error(`El servidor no respondió correctamente (${response.status})`);
+        }
+        
+        if (!response.ok) {
+          throw new Error(data.message || data.error || 'Error al iniciar sesión');
+        }
+        
+        // Store user info in sessionStorage
+        sessionStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Redirect ALL users to clean URL (no role-based redirect)
+        window.location.href = '/';
+        
+      } catch (error) {
+        console.error('Login error:', error);
+        showError(error.message || window.i18n.t('login_error_generic') || 'Error al iniciar sesión');
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span data-i18n="login_button">Iniciar Sesión</span>';
+      }
+    });
+    
+    function showError(message) {
+      loginError.textContent = message;
+      loginError.classList.add('show');
+    }
+    
+    function hideError() {
+      loginError.classList.remove('show');
+    }
+  </script>
+</body>
+</html>

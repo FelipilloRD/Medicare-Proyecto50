@@ -1,0 +1,33 @@
+node_modules/
+.env
+.env.local
+.env.production
+.env.*.local
+data/*.db
+*.log
+.DS_Store
+
+# Archivos con credenciales sensibles
+.env.production.template
+data/users.json
+data/appointments.json
+data/reminders.json
+
+# Archivos ZIP y binarios
+*.zip
+*.tar.gz
+*.rar
+
+# Scripts con credenciales
+*aws*.sh
+*aws*.ps1
+*supabase*.bat
+*postgres*.bat
+fix-passwords*.js
+verificar-usuarios.js
+
+# Archivos de deployment específicos
+deploy-*.sh
+deploy-*.ps1
+sync-*.sh
+sync-*.ps1

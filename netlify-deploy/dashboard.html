@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Clínica MediCare - Admin Dashboard">
+  <title>✦ Clínica MediCare - Dashboard Administrativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">Clínica MediCare</span>
+      </div>
+      
+      <nav class="nav">
+        <a href="index.html" class="nav-link">Inicio</a>
+        <a href="dashboard.html" class="nav-link active">Dashboard</a>
+      </nav>
+      
+      <div style="display: flex; align-items: center; gap: 1rem; margin-left: auto;">
+        <div id="user-info" style="color: var(--text-secondary); font-size: 0.9rem;"></div>
+        <button id="logout-btn" class="btn btn-primary">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      <!-- Dashboard Header -->
+      <div class="dashboard-header">
+        <div>
+          <h1 class="dashboard-title">Dashboard Administrativo</h1>
+          <p class="dashboard-subtitle">Estadísticas y métricas del sistema</p>
+        </div>
+        <div class="dashboard-actions">
+          <button id="refresh-btn" class="btn btn-primary">
+            🔄 Actualizar
+          </button>
+          <button id="export-btn" class="btn btn-primary">
+            📥 Exportar CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-state" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Cargando estadísticas...</p>
+      </div>
+
+      <!-- Dashboard Content -->
+      <div id="dashboard-content" style="display: none;">
+        <!-- Summary Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+              <div class="stat-label">Total Citas</div>
+              <div class="stat-value" id="stat-appointments">0</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-content">
+              <div class="stat-label">Recordatorios</div>
+              <div class="stat-value" id="stat-reminders">0</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+              <div class="stat-label">Tasa Confirmación</div>
+              <div class="stat-value" id="stat-confirmation">0%</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">📧</div>
+            <div class="stat-content">
+              <div class="stat-label">Recordatorios Enviados</div>
+              <div class="stat-value" id="stat-sent-reminders">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Tendencia de Citas (Últimos 30 días)</h3>
+              <span class="chart-subtitle">Citas por día</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="appointments-trend-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Distribución por Servicio</h3>
+              <span class="chart-subtitle">Citas por tipo de servicio</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="service-distribution-chart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Métricas de Calidad</h3>
+              <span class="chart-subtitle">Tasas de éxito</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="quality-metrics-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="data-table-card">
+          <div class="chart-header">
+            <h3>Próximas Citas (7 días)</h3>
+            <span class="chart-subtitle" id="upcoming-count">0 citas programadas</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Servicio</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody id="upcoming-appointments-table">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                    No hay citas próximas
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="data-table-card">
+          <div class="chart-header">
+            <h3>Citas Recientes</h3>
+            <span class="chart-subtitle" id="recent-count">Últimas 10 citas</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Paciente</th>
+                  <th>Servicio</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="recent-appointments-table">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                    No hay citas recientes
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Last Updated -->
+        <div class="dashboard-footer">
+          <p>Última actualización: <span id="last-updated">--</span></p>
+          <p>Auto-actualización cada 5 minutos</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Clínica MediCare. Todos los derechos reservados.</p>
+      <p>📞 +1 829 555 0000 | ✉️ info@clinicamedicare.com</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="dashboard.js"></script>
+</body>
+</html>
