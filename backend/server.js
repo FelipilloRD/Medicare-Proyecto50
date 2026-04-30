@@ -621,9 +621,22 @@ app.get('/api/auth/permissions', requireAuth, (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * POST /api/ai - Endpoint genérico para llamar a la IA
+ * GET /api/config/clinic - Configuración pública de la clínica
  */
-app.post('/api/ai', requireAuth, doubleCsrfProtection, async (req, res) => {
+app.get('/api/config/clinic', (req, res) => {
+  res.json({
+    name: process.env.CLINIC_NAME || 'MediCare AI',
+    phone: process.env.CLINIC_PHONE || '+1 849 587 0107',
+    email: process.env.CLINIC_EMAIL || 'info@medicare-ai.com',
+    address: process.env.CLINIC_ADDRESS || 'Av. Principal 123, Santo Domingo, RD',
+    whatsapp: process.env.CLINIC_WHATSAPP_NUMBER || '18495870107'
+  });
+});
+
+/**
+ * POST /api/ai - Endpoint genérico para llamar a la IA (público)
+ */
+app.post('/api/ai', async (req, res) => {
   try {
     const { system, messages } = req.body;
     
@@ -644,7 +657,7 @@ app.post('/api/ai', requireAuth, doubleCsrfProtection, async (req, res) => {
 /**
  * POST /api/schedule - Agenda una cita con confirmación de IA
  */
-app.post('/api/schedule', requireAuth, doubleCsrfProtection, async (req, res) => {
+app.post('/api/schedule', async (req, res) => {
   try {
     let { name, email, phone, date, time, service, notes, lang } = req.body;
     
@@ -653,22 +666,11 @@ app.post('/api/schedule', requireAuth, doubleCsrfProtection, async (req, res) =>
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
     
-    // Role-based email handling:
-    // - Patient users: Always use their own email (ignore email from form)
-    // - Admin users: Can schedule for any email
-    if (req.user.role === 'patient') {
-      email = req.user.email; // Force patient's own email
-      console.log(`Patient ${req.user.username} scheduling appointment with their email: ${email}`);
-    } else if (req.user.role === 'admin') {
-      // Admin can use any email, but require it
-      if (!email) {
-        return res.status(400).json({ 
-          error: 'Email is required',
-          message: 'Admin users must provide an email address for the appointment'
-        });
-      }
-      console.log(`Admin ${req.user.username} scheduling appointment for: ${email}`);
+    // Usar email del formulario directamente (sin autenticación requerida)
+    if (!email) {
+      email = 'paciente@clinica.com'; // Fallback
     }
+    console.log(`Scheduling appointment for: ${name} (${email})`);
     
     // Generar confirmación con IA (con fallback a mensaje por defecto)
     let aiConfirmation = '';
@@ -740,7 +742,7 @@ ${notes ? `Notas: ${notes}` : ''}`;
 /**
  * POST /api/service-info - Obtiene información de un servicio médico
  */
-app.post('/api/service-info', requireAuth, doubleCsrfProtection, async (req, res) => {
+app.post('/api/service-info', async (req, res) => {
   try {
     const { service, lang } = req.body;
     
@@ -767,7 +769,7 @@ Incluye: qué es, cuándo se necesita, qué esperar, y duración aproximada.`;
 /**
  * POST /api/reminder - Genera un recordatorio manual
  */
-app.post('/api/reminder', requireAuth, doubleCsrfProtection, async (req, res) => {
+app.post('/api/reminder', async (req, res) => {
   try {
     const { name, service, date, lang } = req.body;
     
@@ -775,14 +777,7 @@ app.post('/api/reminder', requireAuth, doubleCsrfProtection, async (req, res) =>
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
     
-    // For patient users, use their own email as the name
-    // For admin users, use the provided name or default to "Patient"
-    let reminderName = name;
-    if (req.user.role === 'patient') {
-      reminderName = req.user.email; // Patients can only create reminders for themselves
-    } else if (!reminderName) {
-      reminderName = 'Patient'; // Default for admins
-    }
+    const reminderName = name || 'Paciente';
     
     const systemPrompt = `Eres un asistente médico de ${process.env.CLINIC_NAME || 'MediCare AI'}.
 Genera un recordatorio amigable y profesional.
@@ -801,8 +796,7 @@ Fecha: ${date}`;
       date,
       lang: lang || 'es',
       message,
-      auto: false,
-      created_by: req.user.id // Track who created the reminder
+      auto: false
     });
     
     res.json({ success: true, reminder, message });
@@ -815,7 +809,7 @@ Fecha: ${date}`;
 /**
  * POST /api/chat - Chat asistente multiidioma
  */
-app.post('/api/chat', requireAuth, doubleCsrfProtection, async (req, res) => {
+app.post('/api/chat', async (req, res) => {
   try {
     const { message, lang } = req.body;
     

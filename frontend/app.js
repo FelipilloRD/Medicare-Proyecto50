@@ -299,18 +299,7 @@ function initAppointmentForm() {
  * Agenda una cita con IA
  */
 async function scheduleAppointment() {
-  if (isLoading) return;
-  
-  // Check if user is authenticated before scheduling
-  if (!currentUser) {
-    showNotification('Debes iniciar sesión para agendar una cita', 'error');
-    
-    // Show modal asking to login or register
-    if (confirm('Necesitas iniciar sesión o crear una cuenta para agendar una cita. ¿Deseas ir a la página de login?')) {
-      window.location.href = '/login';
-    }
-    return;
-  }
+  // No authentication required - appointments are public
   
   const form = document.getElementById('appointment-form');
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -340,19 +329,12 @@ async function scheduleAppointment() {
     submitBtn.textContent = window.i18n.t('form_loading');
     responseDiv.innerHTML = '<div class="loading">⏳ Procesando con IA...</div>';
     
-    // Ensure we have a CSRF token
-    if (!csrfToken) {
-      await getCsrfToken();
-    }
-    
-    // Llamar al API
+    // Llamar al API (sin CSRF ni credenciales de sesión)
     const response = await fetch(`${API_BASE}/api/schedule`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken || '' // Include CSRF token
+        'Content-Type': 'application/json'
       },
-      credentials: 'include', // Include session cookies
       body: JSON.stringify(formData)
     });
     
@@ -455,18 +437,11 @@ async function showServiceInfo(service) {
   modalContent.innerHTML = '<div class="loading">⏳ Consultando con IA...</div>';
   
   try {
-    // Ensure we have a CSRF token
-    if (!csrfToken) {
-      await getCsrfToken();
-    }
-    
     const response = await fetch(`${API_BASE}/api/service-info`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken || '' // Include CSRF token
+        'Content-Type': 'application/json'
       },
-      credentials: 'include', // Include session cookies
       body: JSON.stringify({
         service,
         lang: window.i18n.getCurrentLanguage()
@@ -543,18 +518,11 @@ async function generateReminder() {
     submitBtn.textContent = window.i18n.t('loading');
     responseDiv.innerHTML = '<div class="loading">⏳ Generando recordatorio con IA...</div>';
     
-    // Ensure we have a CSRF token
-    if (!csrfToken) {
-      await getCsrfToken();
-    }
-    
     const response = await fetch(`${API_BASE}/api/reminder`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken || '' // Include CSRF token
+        'Content-Type': 'application/json'
       },
-      credentials: 'include', // Include session cookies
       body: JSON.stringify(formData)
     });
     
@@ -619,18 +587,11 @@ async function sendChatMessage() {
   try {
     isLoading = true;
     
-    // Ensure we have a CSRF token
-    if (!csrfToken) {
-      await getCsrfToken();
-    }
-    
     const response = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': csrfToken || '' // Include CSRF token
+        'Content-Type': 'application/json'
       },
-      credentials: 'include', // Include session cookies
       body: JSON.stringify({
         message,
         lang: window.i18n.getCurrentLanguage()
