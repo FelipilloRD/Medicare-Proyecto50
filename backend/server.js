@@ -1469,26 +1469,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Ruta principal - redirige al login si no está autenticado
-app.get('/', optionalAuth, (req, res) => {
-  // Si el usuario está autenticado, mostrar index.html
-  if (req.user) {
-    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
-  } else {
-    // Si no está autenticado, redirigir al login
-    res.redirect('/login.html');
-  }
+// Ruta principal - acceso público (no requiere autenticación)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
-// Ruta para index.html - requiere autenticación
-app.get('/index.html', optionalAuth, (req, res) => {
-  // Si el usuario está autenticado, mostrar index.html
-  if (req.user) {
-    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
-  } else {
-    // Si no está autenticado, redirigir al login
-    res.redirect('/login.html');
-  }
+// Ruta para index.html - acceso público (no requiere autenticación)
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
 // Iniciar servidor

@@ -1,5 +1,0 @@
-# Redirect all API calls to AWS backend
-/api/* http://18.224.136.235:3002/api/:splat 200
-
-# SPA fallback
-/* /index.html 200

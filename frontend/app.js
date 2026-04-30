@@ -33,17 +33,8 @@ async function getCsrfToken() {
  * Inicializa la aplicación
  */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Check authentication status
+  // Check authentication status (but don't redirect if not authenticated)
   const isAuthenticated = await checkAuthStatus();
-  
-  if (!isAuthenticated) {
-    // Redirect to login page
-    window.location.href = '/login';
-    return;
-  }
-  
-  // Get CSRF token for protected requests
-  await getCsrfToken();
   
   // Initialize app components
   initNavigation();
@@ -52,8 +43,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   initServiceCards();
   initReminderForm();
   initChat();
-  initLogoutButton();
-  updateUIForUser();
+  
+  // Only initialize logout button if authenticated
+  if (isAuthenticated) {
+    await getCsrfToken();
+    initLogoutButton();
+    updateUIForUser();
+  } else {
+    // Show login/register button instead
+    initLoginButton();
+  }
   
   // Mostrar vista inicial
   showView('home');
@@ -101,6 +100,26 @@ function initLogoutButton() {
     
     // Insert after nav links
     nav.parentElement.insertBefore(logoutBtn, nav.nextSibling);
+  }
+}
+
+/**
+ * Initialize login button (for non-authenticated users)
+ */
+function initLoginButton() {
+  const nav = document.querySelector('.nav');
+  if (nav && !document.getElementById('login-btn')) {
+    const loginBtn = document.createElement('button');
+    loginBtn.id = 'login-btn';
+    loginBtn.className = 'btn btn-primary';
+    loginBtn.style.marginLeft = 'auto';
+    loginBtn.textContent = window.i18n.t('login_button') || 'Iniciar Sesión';
+    loginBtn.addEventListener('click', () => {
+      window.location.href = '/login';
+    });
+    
+    // Insert after nav links
+    nav.parentElement.insertBefore(loginBtn, nav.nextSibling);
   }
 }
 
@@ -282,6 +301,17 @@ function initAppointmentForm() {
 async function scheduleAppointment() {
   if (isLoading) return;
   
+  // Check if user is authenticated before scheduling
+  if (!currentUser) {
+    showNotification('Debes iniciar sesión para agendar una cita', 'error');
+    
+    // Show modal asking to login or register
+    if (confirm('Necesitas iniciar sesión o crear una cuenta para agendar una cita. ¿Deseas ir a la página de login?')) {
+      window.location.href = '/login';
+    }
+    return;
+  }
+  
   const form = document.getElementById('appointment-form');
   const submitBtn = form.querySelector('button[type="submit"]');
   const responseDiv = document.getElementById('ai-response');
@@ -329,6 +359,14 @@ async function scheduleAppointment() {
     const data = await response.json();
     
     if (!response.ok) {
+      // If unauthorized, redirect to login
+      if (response.status === 401) {
+        showNotification('Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 'error');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+        return;
+      }
       throw new Error(data.error || 'Error al agendar la cita');
     }
     
